@@ -1,4 +1,5 @@
 import streamlit as st
+from io import StringIO
 import sys
 
 @st.cache_data
@@ -10,6 +11,10 @@ def read_file(filename):
         print(f"Error: File '{filename}' not found.")
         sys.exit(1)
     return content
+
+@st.cache_data
+def read_file_from_session():
+    return st.session_state.uploaded_file
 
 @st.cache_data
 def split_content(text):
@@ -55,22 +60,16 @@ def make_index(pages):
   return index
 
 def display_page(page_content):
-    #st.divider()
     st.markdown(page_content, unsafe_allow_html=True)
     st.divider()
 
-def find_index(list, target):
-  for i, str in enumerate(list):
+def find_index(lst, target):
+  for i, str in enumerate(lst):
     if str == target:
       return i
   return -1
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: streamlit run md.py <filename>")
-        sys.exit(1)
-
-    content = read_file(sys.argv[1])
+def show_content(content):
     pages = split_content(content)
     toc = make_index(pages)
 
@@ -80,7 +79,7 @@ def main():
     if 'sidebar_state' not in st.session_state:
         st.session_state.sidebar_state = False
 
-    if st.session_state.sidebar_state == True:
+    if st.session_state.sidebar_state:
         with st.sidebar:
             idx = st.session_state.current_page
             selected = st.radio("Contents:", toc, index=idx)
@@ -120,6 +119,24 @@ def main():
         if st.button("Next", disabled=(st.session_state.current_page == len(pages)-1)):
             st.session_state.current_page += 1
             st.rerun()
+
+def main():
+    content = None
+    if len(sys.argv) == 2:
+        content = read_file(sys.argv[1])
+    elif 'uploaded_file' not in st.session_state:
+        st.header("Markdown Viewer", divider='rainbow')
+        uploaded_file = st.file_uploader("Choose a Markdown file", type=['md'])
+        if uploaded_file is not None:
+            st.session_state.uploaded_file = uploaded_file.getvalue().decode("utf-8")
+            st.success("File uploaded successfully!")
+            if st.button("Show me the Markdown"):
+                st.rerun()
+    else:
+        content = read_file_from_session()
+
+    if content is not None:
+        show_content(content)
 
 if __name__ == "__main__":
     main()
