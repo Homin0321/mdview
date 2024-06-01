@@ -122,6 +122,7 @@ def show_content(content):
 
 def main():
     content = None
+    st.set_page_config(page_title="Markdown Viewer", page_icon=":book:") 
     if len(sys.argv) == 2:
         content = read_file(sys.argv[1])
     elif 'uploaded_file' not in st.session_state:
