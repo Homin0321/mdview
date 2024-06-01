@@ -5,12 +5,37 @@ import sys
 def read_file(filename):
     try:
         with open(filename, "r") as f:
-            markdown_content = f.read()
+            content = f.read()
     except FileNotFoundError:
         print(f"Error: File '{filename}' not found.")
         sys.exit(1)
+    return content
 
-    return markdown_content.split("---\n")
+@st.cache_data
+def split_content(text):
+    # Separator: ---
+    pages = text.split("---\n")
+    # Separator: ## 
+    if len(pages) == 1:
+        parts = text.split('\n## ')
+        if len(parts) != 1:
+            return [f"## {part.strip()}" for part in parts]
+    # Separator: ** ~ **
+    if len(pages) == 1:
+        parts = []
+        current_part = ""
+        for line in text.splitlines():
+            if line.startswith("**") and line.endswith("**"):
+                if current_part:
+                    parts.append(current_part)
+                    current_part = line + "\n"
+            else:
+                current_part += line + "\n"
+        if current_part:
+            parts.append(current_part)
+        return parts
+
+    return pages
 
 def remove_leading_hashes(text):
   if text.startswith('#'):
@@ -45,7 +70,8 @@ def main():
         print("Usage: streamlit run md.py <filename>")
         sys.exit(1)
 
-    pages = read_file(sys.argv[1])
+    content = read_file(sys.argv[1])
+    pages = split_content(content)
     toc = make_index(pages)
 
     # Initialize session state for page navigation
@@ -81,13 +107,14 @@ def main():
             st.rerun()
 
     with col3:
-        page = st.slider("Go to", min_value=1, max_value=len(pages), 
-            value=st.session_state.current_page + 1, 
-            label_visibility="collapsed")
-        page -= 1
-        if page != st.session_state.current_page:
-            st.session_state.current_page = page 
-            st.rerun()
+        if len(pages) > 1:
+            page = st.slider("Go to", min_value=1, max_value=len(pages), 
+                value=st.session_state.current_page + 1, 
+                label_visibility="collapsed")
+            page -= 1
+            if page != st.session_state.current_page:
+                st.session_state.current_page = page 
+                st.rerun()
 
     with col4:
         if st.button("Next", disabled=(st.session_state.current_page == len(pages)-1)):
