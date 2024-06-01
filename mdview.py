@@ -129,6 +129,7 @@ def main():
         st.header("Markdown Viewer", divider='rainbow')
         uploaded_file = st.file_uploader("Choose a Markdown file", type=['md'])
         if uploaded_file is not None:
+            st.cache_data.clear()
             st.session_state.uploaded_file = uploaded_file.getvalue().decode("utf-8")
             st.success("File uploaded successfully!")
             if st.button("Show me the Markdown"):
