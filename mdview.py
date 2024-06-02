@@ -112,17 +112,17 @@ def show_content(content):
     display_page(pages[st.session_state.current_page])
 
     # Navigation slider and buttons
-    col1, col2, col3, col4 = st.columns([1, 1, 7, 1])
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 7, 1, 1])
 
     with col1:
         # Previous page button
-        if st.button("Prev", disabled=(st.session_state.current_page == 0)):
+        if st.button(":arrow_left:", disabled=(st.session_state.current_page == 0)):
             st.session_state.current_page -= 1
             st.rerun()
 
     with col2:
         # Toggle table of contents sidebar
-        if st.button("ToC"):
+        if st.button(":compass:"):
             st.session_state.sidebar_state = not st.session_state.sidebar_state
             st.rerun()
 
@@ -138,8 +138,13 @@ def show_content(content):
                 st.rerun()
 
     with col4:
+        # Show Markdown source
+        with st.popover(":page_with_curl:"):
+            st.code(pages[st.session_state.current_page], language="markdown")
+
+    with col5:
         # Next page button
-        if st.button("Next", disabled=(st.session_state.current_page == len(pages)-1)):
+        if st.button(":arrow_right:", disabled=(st.session_state.current_page == len(pages)-1)):
             st.session_state.current_page += 1
             st.rerun()
 
