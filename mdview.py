@@ -59,9 +59,9 @@ def remove_leading_hashes(text):
 def make_index(pages):
     # Creates an index of page titles from the first line of each page
     index = []
-    for page in pages:
+    for i, page in enumerate(pages):
         first_line = page.split('\n')[0]
-        first_line = remove_leading_hashes(first_line)
+        first_line = f"{i+1}. {remove_leading_hashes(first_line)}"
         index.append(first_line)
     return index
 
