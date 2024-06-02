@@ -66,7 +66,7 @@ def make_index(pages):
     # Creates an index of page titles from the first line of each page
     index = []
     for i, page in enumerate(pages):
-        first_line = page.split('\n')[0]
+        first_line = page.strip().split('\n')[0]
         first_line = remove_decorators(first_line)
         first_line = first_line[:30] + "..." if len(first_line) > 30 else first_line
         first_line = f"{i+1}. {first_line}"
