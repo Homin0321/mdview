@@ -1,6 +1,7 @@
 import streamlit as st
 from io import StringIO
 import sys
+import re
 
 @st.cache_data
 def read_file(filename):
@@ -25,9 +26,9 @@ def split_content(text):
     pages = text.split("---\n")  # Separator: ---
     if len(pages) == 1:
         # If no pages were found with "---", try splitting by "## "
-        parts = text.split('\n## ')
+        parts = re.split(r'\n##? ', text)
         if len(parts) != 1:
-            return [f"## {part.strip()}" for part in parts]
+            return [f"{part.strip()}" for part in parts]
     if len(pages) == 1:
         # If still no pages, try splitting by "** ~ **"
         parts = []
