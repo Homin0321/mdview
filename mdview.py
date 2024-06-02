@@ -99,8 +99,7 @@ def show_content(content):
     # Show table of contents in the sidebar if enabled
     if st.session_state.sidebar_state:
         with st.sidebar:
-            st.write(st.session_state.file_name)
-            st.divider()
+            st.subheader(st.session_state.file_name, divider='rainbow')
             idx = st.session_state.current_page
             selected = st.radio("Contents:", toc, index=idx)
             if selected is not None:
