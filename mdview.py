@@ -46,13 +46,19 @@ def split_content(text):
 
     return pages
 
-def remove_leading_hashes(text):
+def remove_decorators(text):
     # Removes leading hashes from a string (typically a heading)
     if text.startswith('#'):
         i = 0
         while i < len(text) and text[i] == '#':
             i += 1
         text = text[i:].lstrip()
+    
+    if text.startswith("**") and text.endswith("**"):
+        text = text[2:-2]
+
+    if text.endswith(":"):
+        text = text[:-1]
     return text
 
 @st.cache_data
@@ -61,7 +67,9 @@ def make_index(pages):
     index = []
     for i, page in enumerate(pages):
         first_line = page.split('\n')[0]
-        first_line = f"{i+1}. {remove_leading_hashes(first_line)}"
+        first_line = remove_decorators(first_line)
+        first_line = first_line[:30] + "..." if len(first_line) > 30 else first_line
+        first_line = f"{i+1}. {first_line}"
         index.append(first_line)
     return index
 
@@ -91,6 +99,8 @@ def show_content(content):
     # Show table of contents in the sidebar if enabled
     if st.session_state.sidebar_state:
         with st.sidebar:
+            st.write(st.session_state.file_name)
+            st.divider()
             idx = st.session_state.current_page
             selected = st.radio("Contents:", toc, index=idx)
             if selected is not None:
@@ -140,7 +150,8 @@ def main():
     st.set_page_config(page_title="Markdown Viewer", page_icon=":book:")
     if len(sys.argv) == 2:
         # Read file from command line argument
-        content = read_file(sys.argv[1])
+        st.session_state.file_name = file_name = sys.argv[1]
+        content = read_file(file_name)
     elif 'uploaded_file' not in st.session_state:
         # File upload interface
         st.header("Markdown Viewer", divider='rainbow')
@@ -148,6 +159,7 @@ def main():
         if uploaded_file is not None:
             st.cache_data.clear()
             st.session_state.uploaded_file = uploaded_file.getvalue().decode("utf-8")
+            st.session_state.file_name = uploaded_file.name
             st.success("File uploaded successfully!")
             if st.button("Show me the Markdown"):
                 st.rerun()
