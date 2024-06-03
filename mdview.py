@@ -20,31 +20,42 @@ def read_file_from_session():
     # Retrieves the uploaded file from session state
     return st.session_state.uploaded_file
 
+# Function to split based on a regular expression
+def split_by_regex(regex, text):
+    parts = []
+    current_part = ""
+    for line in text.splitlines():
+        if re.match(regex, line):
+            if current_part:
+                parts.append(current_part)
+                current_part = ""
+            current_part += line + "\n"
+        else:
+            current_part += line + "\n"
+    if current_part:
+        parts.append(current_part)
+    return parts
+
 @st.cache_data
 def split_content(text):
-    # Splits the text into pages based on different separators
-    pages = text.split("---\n")  # Separator: ---
-    if len(pages) == 1:
-        # If no pages were found with "---", try splitting by "## "
-        parts = re.split(r'\n##? ', text)
-        if len(parts) != 1:
-            return [f"{part.strip()}" for part in parts]
-    if len(pages) == 1:
-        # If still no pages, try splitting by "** ~ **"
-        parts = []
-        current_part = ""
-        for line in text.splitlines():
-            if line.startswith("**") and line.endswith("**"):
-                if current_part:
-                    parts.append(current_part)
-                    current_part = line + "\n"
-            else:
-                current_part += line + "\n"
-        if current_part:
-            parts.append(current_part)
+    # Attempt to split by the primary separator "---"
+    pages = text.split("---\n")
+    
+    if len(pages) > 1:
+        return pages
+
+    # Attempt to split by headings (e.g., "# Heading")
+    parts = split_by_regex(r'^(#+)\s+(.*)', text)
+    if len(parts) > 1:
         return parts
 
-    return pages
+    # Attempt to split by "** ~ :**"
+    parts = split_by_regex(r'^\*\*(.*?):\*\*$', text)
+    if len(parts) > 1:
+        return parts
+
+    # If no splitting occurred, return the original text as a single element list
+    return [text]
 
 def remove_decorators(text):
     # Removes leading hashes from a string (typically a heading)
