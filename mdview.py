@@ -167,6 +167,16 @@ def main():
             st.success("File uploaded successfully!")
             if st.button("Show me the Markdown"):
                 st.rerun()
+        
+        # Text input interface
+        form = st.form(key="box")
+        text = form.text_area("Or, Input Text here")
+        submit = form.form_submit_button("Submit")
+        if submit:
+            st.cache_data.clear()
+            st.session_state.uploaded_file = text
+            st.session_state.file_name = "" 
+            st.rerun()
     else:
         # Read file from session state
         content = read_file_from_session()
