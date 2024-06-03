@@ -157,26 +157,26 @@ def main():
         st.session_state.file_name = file_name = sys.argv[1]
         content = read_file(file_name)
     elif 'uploaded_file' not in st.session_state:
-        # File upload interface
-        st.header("Markdown Viewer", divider='rainbow')
-        uploaded_file = st.file_uploader("Choose a Markdown file", type=['md'])
-        if uploaded_file is not None:
-            st.cache_data.clear()
-            st.session_state.uploaded_file = uploaded_file.getvalue().decode("utf-8")
-            st.session_state.file_name = uploaded_file.name
-            st.success("File uploaded successfully!")
-            if st.button("Show me the Markdown"):
-                st.rerun()
-        
         # Text input interface
         form = st.form(key="box")
-        text = form.text_area("Or, Input Text here")
+        text = form.text_area("Input Text here")
         submit = form.form_submit_button("Submit")
         if submit:
             st.cache_data.clear()
             st.session_state.uploaded_file = text
             st.session_state.file_name = "" 
             st.rerun()
+            
+        # File upload interface
+        st.header("Markdown Viewer", divider='rainbow')
+        uploaded_file = st.file_uploader("Upload a Markdown file", type=['md'])
+        if uploaded_file is not None:
+            st.cache_data.clear()
+            st.session_state.uploaded_file = uploaded_file.getvalue().decode("utf-8")
+            st.session_state.file_name = uploaded_file.name
+            st.success("File uploaded successfully!")
+            if st.button("Show me the Markdown"):
+                st.rerun()       
     else:
         # Read file from session state
         content = read_file_from_session()
