@@ -127,7 +127,7 @@ def show_content(content):
 
     with col1:
         # Previous page button
-        if st.button(":arrow_left:", disabled=(st.session_state.current_page == 0)):
+        if st.button("◀", disabled=(st.session_state.current_page == 0)):
             st.session_state.current_page -= 1
             st.rerun()
 
@@ -155,7 +155,7 @@ def show_content(content):
 
     with col5:
         # Next page button
-        if st.button(":arrow_right:", disabled=(st.session_state.current_page == len(pages)-1)):
+        if st.button("▶", disabled=(st.session_state.current_page == len(pages)-1)):
             st.session_state.current_page += 1
             st.rerun()
 
