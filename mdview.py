@@ -50,7 +50,7 @@ def split_content(text):
         return parts
 
     # Attempt to split by "** ~ :**"
-    parts = split_by_regex(r'^\*\*(.*?):\*\*$', text)
+    parts = split_by_regex(r'^\*\*(.*?)\*\*$', text)
     if len(parts) > 1:
         return parts
 
