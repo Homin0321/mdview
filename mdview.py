@@ -40,7 +40,6 @@ def split_by_regex(regex, text):
 def split_content(text):
     # Attempt to split by the primary separator "---"
     pages = text.split("---\n")
-    
     if len(pages) > 1:
         return pages
 
@@ -49,7 +48,7 @@ def split_content(text):
     if len(parts) > 1:
         return parts
 
-    # Attempt to split by "** ~ :**"
+    # Attempt to split by "** ~ **\n"
     parts = split_by_regex(r'^\*\*(.*?)\*\*$', text)
     if len(parts) > 1:
         return parts
@@ -169,6 +168,7 @@ def main():
         content = read_file(file_name)
     elif 'uploaded_file' not in st.session_state:
         st.header("Markdown Viewer", divider='rainbow')
+        
         # Text input interface
         form = st.form(key="box")
         text = form.text_area("Input Text here")
